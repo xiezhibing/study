@@ -1,0 +1,100 @@
+spring:
+  application:
+    name: server-zuul
+  profiles:
+    active: dev
+  mvc:
+    throw-exception-if-no-handler-found: true #出现错误时, 直接抛出异常
+  resources:
+    add-mappings: false #不要为我们工程中的资源文件建立映射
+
+  #热部署
+  devtools:
+    restart:
+      enabled: true
+
+server:
+  port: 12200
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://127.0.0.1:12000/eureka #eureka服务端提供的注册地址 参考服务端配置的这个路径
+  instance:
+    instance-id: zuul-1 #实例名
+    prefer-ip-address: true #是否显示IP地址
+    leaseRenewalIntervalInSeconds: 10 #eureka客户需要多长时间发送心跳给eureka服务器，表明它仍然活着,默认为30 秒 (与下面配置的单位都是秒)
+    leaseExpirationDurationInSeconds: 30 #Eureka服务器在接收到实例的最后一次发出的心跳后，需要等待多久才可以将此实例删除，默认为90秒
+
+###### 配置1 ######
+## 访问成功的URL
+## http://127.0.0.1:12200/api-user/api/v1/user/list
+## http://127.0.0.1:12200/server-user/api-user/api/v1/user/list
+## http://127.0.0.1:12200/api-fund/api/v1/fund/list
+## http://127.0.0.1:12200/server-fund/api-fund/api/v1/fund/list
+#zuul:
+#  routes:
+#    api-user:
+#      id: api-user
+#      path: /api-user/**
+#      serviceId: server-user
+#    api-fund:
+#      id: api-fund
+#      path: /api-fund/**
+#      serviceId: server-fund
+
+
+###### 配置2 ######
+## 访问成功的URL
+## http://127.0.0.1:12200/api-user/api/v1/user/list
+## http://127.0.0.1:12200/api-fund/api/v1/fund/list
+#zuul:
+#  ignored-services: "*" #禁用微服务名访问
+#  routes:
+#    api-user:
+#      id: api-user
+#      path: /api-user/**
+#      serviceId: server-user
+#    api-fund:
+#      id: api-fund
+#      path: /api-fund/**
+#      serviceId: server-fund
+
+
+###### 配置3 ######
+## 访问成功的URL
+## http://127.0.0.1:12200/api/v0/api-user/api/v1/user/list
+## http://127.0.0.1:12200/api/v0/api-fund/api/v1/fund/list
+#zuul:
+#  prefix: /api/v0 #zuul统一请求的前缀
+#  ignored-services: "*" #禁用微服务名访问
+#  routes:
+#    api-user:
+#      id: api-user
+#      path: /api-user/**
+#      serviceId: server-user
+#    api-fund:
+#      id: api-fund
+#      path: /api-fund/**
+#      serviceId: server-fund
+
+
+###### 配置4 ######
+## 访问成功的URL
+## http://127.0.0.1:12200/api/v1/api-user/user/list
+## http://127.0.0.1:12200/api/v1/api-fund/fund/list
+zuul:
+  prefix: /api/v1 #zuul统一请求的前缀
+  strip-prefix: false #zuul会为zuul和他所调用的微服务加前缀prefix
+  ignored-services: "*" #禁用微服务名访问
+  routes:
+    api-user:
+      id: api-user
+      path: /api-user/**
+      serviceId: server-user
+    api-fund:
+      id: api-fund
+      path: /api-fund/**
+      serviceId: server-fund
+
+

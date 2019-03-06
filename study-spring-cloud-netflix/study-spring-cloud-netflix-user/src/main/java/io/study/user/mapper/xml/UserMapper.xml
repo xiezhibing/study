@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.study.user.mapper.UserMapper">
+	<!-- 开启二级缓存 -->
+	<!--<cache type="org.mybatis.caches.ehcache.LoggingEhcache"/>-->
+
+	<!-- 新增 -->
+	<insert id="add" parameterType="io.study.user.UserInfo">
+		insert into user_info (
+			<if test="code != null">code, </if>
+			<if test="name != null">name, </if>
+			<if test="status != null">status, </if>
+			<if test="phone != null">phone, </if>
+			<if test="password != null">password, </if>
+			<if test="sex != null">sex, </if>
+			id, create_time, modify_time, dr
+		) values (
+			<if test="code != null">#{code}, </if>
+			<if test="name != null">#{name}, </if>
+			<if test="status != null">#{status}, </if>
+			<if test="phone != null">#{phone}, </if>
+			<if test="password != null">#{password}, </if>
+			<if test="sex != null">#{sex}, </if>
+			#{id}, now(), now(), 1
+		)	
+	</insert>
+	
+	<!-- 更新 -->
+	<update id="update" parameterType="io.study.user.UserInfo">
+		update user_info
+		<set>
+			<if test="code != null">code = #{code}, </if>
+			<if test="name != null">name = #{name}, </if>
+			<if test="status != null">status = #{status}, </if>
+			<if test="phone != null">phone = #{phone}, </if>
+			<if test="password != null">password = #{password}, </if>
+			<if test="sex != null">sex = #{sex}, </if>
+			modify_time = now()
+		</set>
+		where id = #{id}
+	</update>
+	
+	<!-- 删除 -->
+	<update id="remove" parameterType="java.lang.String">
+		update user_info set dr = 0, modify_time = now() where id = #{id}
+	</update>
+
+	<!-- 通用查询条件 -->
+	<sql id="whereSql">
+		<if test="code != null and code != ''">
+			and code like concat('%', #{code}, '%')
+		</if>
+		<if test="name != null and name != ''">
+			and name like concat('%', #{name}, '%')
+		</if>
+		<if test="status != null and status != ''">
+			and status like concat('%', #{status}, '%')
+		</if>
+		<if test="phone != null and phone != ''">
+			and phone like concat('%', #{phone}, '%')
+		</if>
+		<if test="password != null and password != ''">
+			and password like concat('%', #{password}, '%')
+		</if>
+		<if test="sex != null and sex != ''">
+			and sex like concat('%', #{sex}, '%')
+		</if>
+			and dr = 1
+	</sql>
+	
+	<!-- 根据主键查询 -->
+	<select id="queryById" parameterType="java.lang.String" resultType="io.study.user.UserInfo">
+		select * from user_info where id = #{id} and dr = 1
+	</select>
+		
+	<!-- 条件查询单个对象 -->
+	<select id="queryOne" parameterType="io.study.user.UserInfo" resultType="io.study.user.UserInfo">
+		select * from user_info where 1=1 <include refid="whereSql"/> limit 0,1
+	</select>
+	
+	<!-- 条件查询 -->
+	<select id="queryList" parameterType="io.study.user.UserInfo" resultType="io.study.user.UserInfo">
+		select * from user_info where 1=1 <include refid="whereSql"/>
+	</select>
+	
+	<!-- 条件查询总数量 -->
+	<select id="queryCount" parameterType="io.study.user.UserInfo" resultType="java.lang.Long">
+		select count(id) from user_info where 1=1 <include refid="whereSql"/>
+	</select>
+	
+</mapper>

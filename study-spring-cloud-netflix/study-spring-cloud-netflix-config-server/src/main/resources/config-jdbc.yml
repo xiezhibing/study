@@ -1,0 +1,21 @@
+server:
+  port: 12300
+
+spring:
+  application:
+    name: config-server
+  profiles:
+    active: jdbc
+  cloud:
+    config:
+      server:
+        default-label: master
+        jdbc:
+          sql: select `key`, `value` from `config_info` where `application`=? and `profile`=? and `label`=?
+
+# mysql 属性配置
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/spring_cloud_config
+    username: root
+    password: root

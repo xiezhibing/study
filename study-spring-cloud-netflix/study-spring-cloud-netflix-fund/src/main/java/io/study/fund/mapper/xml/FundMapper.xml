@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.study.fund.mapper.FundMapper">
+	<!-- 开启二级缓存 -->
+	<!--<cache type="org.mybatis.caches.ehcache.LoggingEhcache"/>-->
+
+	<!-- 新增 -->
+	<insert id="add" parameterType="io.study.fund.FundInfo">
+		insert into fund_info (
+			<if test="userId != null">user_id, </if>
+			<if test="totalAmount != null">total_amount, </if>
+			<if test="availableAmount != null">available_amount, </if>
+			<if test="frozenAmount != null">frozen_amount, </if>
+			id, create_time, modify_time, dr
+		) values (
+			<if test="userId != null">#{userId}, </if>
+			<if test="totalAmount != null">#{totalAmount}, </if>
+			<if test="availableAmount != null">#{availableAmount}, </if>
+			<if test="frozenAmount != null">#{frozenAmount}, </if>
+			#{id}, now(), now(), 1
+		)	
+	</insert>
+	
+	<!-- 更新 -->
+	<update id="update" parameterType="io.study.fund.FundInfo">
+		update fund_info
+		<set>
+			<if test="userId != null">user_id = #{userId}, </if>
+			<if test="totalAmount != null">total_amount = #{totalAmount}, </if>
+			<if test="availableAmount != null">available_amount = #{availableAmount}, </if>
+			<if test="frozenAmount != null">frozen_amount = #{frozenAmount}, </if>
+			modify_time = now()
+		</set>
+		where id = #{id}
+	</update>
+	
+	<!-- 删除 -->
+	<update id="remove" parameterType="java.lang.String">
+		update fund_info set dr = 0, modify_time = now() where id = #{id}
+	</update>
+	
+	<!-- 恢复 -->
+	<update id="revert" parameterType="java.lang.String">
+		update fund_info set dr = 1, modify_time = now() where id = #{id}
+	</update>
+	
+	<!-- 通用查询条件 -->
+	<sql id="whereSql">
+		<if test="userId != null and userId != ''">
+			and user_id = #{userId}
+		</if>
+		<if test="totalAmount != null">
+			and total_amount = #{totalAmount}
+		</if>
+		<if test="availableAmount != null">
+			and available_amount = #{availableAmount}
+		</if>
+		<if test="frozenAmount != null">
+			and frozen_amount = #{frozenAmount}
+		</if>
+			and dr = 1
+	</sql>
+	
+	<!-- 根据主键查询 -->
+	<select id="queryById" parameterType="java.lang.String" resultType="io.study.fund.FundInfo">
+		select * from fund_info where id = #{id} and dr = 1
+	</select>
+		
+	<!-- 条件查询单个对象 -->
+	<select id="queryOne" parameterType="io.study.fund.FundInfo" resultType="io.study.fund.FundInfo">
+		select * from fund_info where 1=1 <include refid="whereSql"/> limit 0,1
+	</select>
+	
+	<!-- 条件查询 -->
+	<select id="queryList" parameterType="io.study.fund.FundInfo" resultType="io.study.fund.FundInfo">
+		select * from fund_info where 1=1 <include refid="whereSql"/>
+	</select>
+	
+	<!-- 条件查询总数量 -->
+	<select id="queryCount" parameterType="io.study.fund.FundInfo" resultType="java.lang.Long">
+		select count(id) from fund_info where 1=1 <include refid="whereSql"/>
+	</select>
+	
+</mapper>
